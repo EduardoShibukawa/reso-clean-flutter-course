@@ -70,7 +70,7 @@ void main() {
       verify(mockNetworkInfo.isConnected);
     });
 
-    runTestsOnline(() {      
+    runTestsOnline(() {
       test(
         'should remote data when the call to remote datasource is successful',
         () async {
@@ -112,7 +112,7 @@ void main() {
         },
       );
     });
-    
+
     runTestsOffline(() {
       setUp(() {
         when(mockNetworkInfo.isConnected).thenAnswer((_) async => false);
@@ -148,7 +148,7 @@ void main() {
     });
   });
 
-  group("getRandomNumberTrivia", () {  
+  group("getRandomNumberTrivia", () {
     final tNumberTriviaModel = NumberTriviaModel(
       text: "test trivia",
       number: 123,
@@ -163,7 +163,7 @@ void main() {
       verify(mockNetworkInfo.isConnected);
     });
 
-    runTestsOnline(() {      
+    runTestsOnline(() {
       test(
         'should remote data when the call to remote datasource is successful',
         () async {
@@ -205,7 +205,7 @@ void main() {
         },
       );
     });
-    
+
     runTestsOffline(() {
       setUp(() {
         when(mockNetworkInfo.isConnected).thenAnswer((_) async => false);
@@ -239,5 +239,5 @@ void main() {
         },
       );
     });
-  });  
+  });
 }
