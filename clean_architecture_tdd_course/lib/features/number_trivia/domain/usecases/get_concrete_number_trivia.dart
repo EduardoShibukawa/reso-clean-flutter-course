@@ -19,6 +19,9 @@ class GetConcreteNumberTrivia implements UseCase<NumberTrivia, Params> {
 
 class Params extends Equatable {
   final int number;
+  
+  @override
+  List<Object> get props => [number];
 
-  Params({@required this.number}) : super([number]);
+  Params({@required this.number});
 }
