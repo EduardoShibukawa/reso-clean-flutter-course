@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:clean_architecture_tdd_course/core/errors/failure.dart';
+import 'package:clean_architecture_tdd_course/core/usecases/usecase.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
@@ -54,11 +56,31 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
               await getConcreteNumberTrivia(Params(number: parsed_number));
 
           yield failureOrTrivia.fold(
-            (failure) {},
+            (failure) => Error(message: _mapFailureToMessage(failure)),
             (trivia) => Loaded(trivia: trivia),
           );
         },
       );
+    } else if (event is GetTriviaForRandomNumber) {
+      yield Loading();
+
+      final failureOrTrivia = await getRandomNumberTrivia(NoParams());
+
+      yield failureOrTrivia.fold(
+        (failure) => Error(message: _mapFailureToMessage(failure)),
+        (trivia) => Loaded(trivia: trivia),
+      );
+    }
+  }
+
+  String _mapFailureToMessage(Failure failure) {
+    switch (failure.runtimeType) {
+      case ServerFailure:
+        return SERVER_FAILURE_MESSAGE;
+      case CacheFailure:
+        return CACHE_FAILURE_MESSAGE;
+      default:
+        return 'Unexpected Error';
     }
   }
 }
