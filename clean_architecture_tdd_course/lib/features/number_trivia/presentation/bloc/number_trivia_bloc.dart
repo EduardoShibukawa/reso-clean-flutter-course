@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:clean_architecture_tdd_course/core/errors/failure.dart';
 import 'package:clean_architecture_tdd_course/core/usecases/usecase.dart';
+import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
@@ -42,35 +43,44 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
     NumberTriviaEvent event,
   ) async* {
     if (event is GetTriviaForConcreteNumber) {
-      final inputEither =
-          inputConverter.stringToUnsignedInteger(event.numberString);
-
-      yield* inputEither.fold(
-        (failure) async* {
-          yield Error(message: INVALID_INPUT_MESSAGE);
-        },
-        (parsed_number) async* {
-          yield Loading();
-
-          final failureOrTrivia =
-              await getConcreteNumberTrivia(Params(number: parsed_number));
-
-          yield failureOrTrivia.fold(
-            (failure) => Error(message: _mapFailureToMessage(failure)),
-            (trivia) => Loaded(trivia: trivia),
-          );
-        },
-      );
+      yield* _mapEventConcreteNumber(event.numberString);
     } else if (event is GetTriviaForRandomNumber) {
-      yield Loading();
-
-      final failureOrTrivia = await getRandomNumberTrivia(NoParams());
-
-      yield failureOrTrivia.fold(
-        (failure) => Error(message: _mapFailureToMessage(failure)),
-        (trivia) => Loaded(trivia: trivia),
-      );
+      yield* _mapEventTriviaRandomNumber();
     }
+  }
+
+  Stream<NumberTriviaState> _mapEventTriviaRandomNumber() async* {
+    yield Loading();
+    
+    final failureOrTrivia = await getRandomNumberTrivia(NoParams());
+    
+    yield* _eitherLoadOrErrorState(failureOrTrivia);
+  }
+
+  Stream<NumberTriviaState> _mapEventConcreteNumber(String numberString) async* {
+    final inputEither =
+        inputConverter.stringToUnsignedInteger(numberString);
+    
+    yield* inputEither.fold(
+      (failure) async* {
+        yield Error(message: INVALID_INPUT_MESSAGE);
+      },
+      (parsed_number) async* {
+        yield Loading();
+    
+        final failureOrTrivia =
+            await getConcreteNumberTrivia(Params(number: parsed_number));
+    
+        yield* _eitherLoadOrErrorState(failureOrTrivia);
+      },
+    );
+  }
+
+  Stream<NumberTriviaState> _eitherLoadOrErrorState(Either<Failure, NumberTrivia> failureOrTrivia) async* {
+    yield failureOrTrivia.fold(
+      (failure) => Error(message: _mapFailureToMessage(failure)),
+      (trivia) => Loaded(trivia: trivia),
+    );
   }
 
   String _mapFailureToMessage(Failure failure) {
