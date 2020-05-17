@@ -17,7 +17,7 @@ class InputConverter {
     }
   }
 
-  bool isValid(int r) => r >= 0;
+  bool isValid(int input) => input >= 0;
 }
 
 class InvalidInputFailure extends Failure {}
