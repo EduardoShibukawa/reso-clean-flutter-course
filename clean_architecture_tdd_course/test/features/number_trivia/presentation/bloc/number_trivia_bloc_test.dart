@@ -70,7 +70,7 @@ void main() {
         ];
         
         expectLater(
-          bloc.state,
+          bloc.asBroadcastStream(),
           emitsInOrder(expected),
         );
         // act
