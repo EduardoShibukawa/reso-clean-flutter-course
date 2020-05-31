@@ -26,39 +26,35 @@ Future<void> init() async {
     ),
   );
 
-  // Use Cases
-  sl.registerSingleton(() => GetConcreteNumberTrivia(sl()));
-  sl.registerSingleton(() => GetRandomNumberTrivia(sl()));
+  // Use cases
+  sl.registerLazySingleton(() => GetConcreteNumberTrivia(sl()));
+  sl.registerLazySingleton(() => GetRandomNumberTrivia(sl()));
 
   // Repository
   sl.registerLazySingleton<NumberTriviaRepository>(
     () => NumberTriviaRepositoryImpl(
-      remoteDataSource: sl(),
       localDataSource: sl(),
       networkInfo: sl(),
+      remoteDataSource: sl(),
     ),
   );
 
   // Data sources
   sl.registerLazySingleton<NumberTriviaRemoteDataSource>(
-    () => NumberTriviaRemoteDataSourceImpl(
-      client: sl(),
-    ),
+    () => NumberTriviaRemoteDataSourceImpl(client: sl()),
   );
+
   sl.registerLazySingleton<NumberTriviaLocalDataSource>(
-    () => NumberTriviaLocalDataSourceImpl(
-      sharedPreferences: sl(),
-    ),
+    () => NumberTriviaLocalDataSourceImpl(sharedPreferences: sl()),
   );
 
   //! Core
-  sl.registerSingleton(() => InputConverter());
+  sl.registerLazySingleton(() => InputConverter());
   sl.registerLazySingleton<NetWorkInfo>(() => NetworkInfoImpl(sl()));
 
   //! External
-  final sharedPreferences = await SharedPreferences.getInstance();      
-
-  sl.registerSingleton(() => sharedPreferences);
-  sl.registerSingleton(() => http.Client());
-  sl.registerSingleton(() => DataConnectionChecker());
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton(() => sharedPreferences);
+  sl.registerLazySingleton(() => http.Client());
+  sl.registerLazySingleton(() => DataConnectionChecker());
 }
